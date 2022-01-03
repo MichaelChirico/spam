@@ -1716,19 +1716,20 @@ all.equal.spam <- function (target, current, tolerance = .Machine$double.eps^0.5
       msg <- c(msg,paste("Row-sparsity structure differ (at least",
                     tmp,"instance(s))"))
 
-    xy <- suppressWarnings(mean(abs(target@entries - current@entries)))
     what <- if (is.null(scale)) {
-        xn <- mean(abs(target@entries))
-        if (is.finite(xn) && xn > tolerance) {
-            xy <- xy/xn
+        scale <- mean(abs(target@entries))
+        if (is.finite(scale) && scale > tolerance) {
             "relative"
         }
-        else "absolute"
+        else {
+            scale <- 1
+            "absolute"
+	}
     }
     else {
-        xy <- xy/scale
         "scaled"
     }
+    xy <- suppressWarnings(mean(abs(target@entries - current@entries) / scale))
     if (is.na(xy) || xy > tolerance)
         msg <- c(msg,paste("Mean", what, "difference:",
             format(xy)))
